@@ -1,0 +1,174 @@
+/* Custom styles for the Shopee Crawler */
+
+/* Fix for Tailwind form elements */
+input, select, textarea {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
+}
+
+/* Tab Styles */
+.tab-item button {
+  position: relative;
+  transition: all 0.3s;
+}
+
+.tab-item.active button {
+  color: #3b82f6;
+  border-bottom: 2px solid #3b82f6;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Queue Tabs */
+.queue-tab-item button {
+  position: relative;
+  transition: all 0.3s;
+}
+
+.queue-tab-item.active button {
+  color: #3b82f6;
+  border-bottom: 2px solid #3b82f6;
+}
+
+.queue-content {
+  display: none;
+}
+
+.queue-content.active {
+  display: block;
+}
+
+/* Toast Notifications */
+.toast {
+  position: relative;
+  min-width: 300px;
+  padding: 1rem;
+  border-radius: 0.375rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  animation: slide-in 0.3s ease-out forwards;
+}
+
+.toast-success {
+  background-color: #10b981;
+  color: white;
+}
+
+.toast-error {
+  background-color: #ef4444;
+  color: white;
+}
+
+.toast-info {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.toast-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  cursor: pointer;
+}
+
+@keyframes slide-in {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.toast.fade-out {
+  animation: fade-out 0.3s ease-in forwards;
+}
+
+/* Status Badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.status-pending {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.status-processing {
+  background-color: #e0f2fe;
+  color: #0284c7;
+}
+
+.status-completed {
+  background-color: #d1fae5;
+  color: #059669;
+}
+
+.status-error {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+/* Table overflow fix */
+.overflow-x-auto {
+  overflow-x: auto;
+}
+
+/* Loading spinner */
+.loader {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #3b82f6;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Star rating display */
+.star-rating {
+  display: inline-flex;
+  align-items: center;
+}
+
+.star-filled {
+  color: #facc15;
+  font-size: 1rem;
+}
+
+.star-empty {
+  color: #d1d5db;
+  font-size: 1rem;
+} 

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Công Cụ Thu Thập Đánh Giá Shopee</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <div class="container mx-auto px-4 py-8">
+    <!-- Header -->
+    <header class="mb-8">
+      <h1 class="text-3xl font-bold text-blue-600 text-center">Công Cụ Thu Thập Đánh Giá Shopee</h1>
+      <p class="text-gray-600 text-center mt-2">Thu thập và quản lý đánh giá sản phẩm từ Shopee</p>
+    </header>
+
+    <!-- Main Tabs -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <div class="tabs">
+        <ul class="flex border-b">
+          <li id="tab-config" class="tab-item active" data-tab="config">
+            <button class="py-2 px-4 font-semibold text-blue-600 border-b-2 border-blue-500">Cấu Hình</button>
+          </li>
+          <li id="tab-crawl" class="tab-item" data-tab="crawl">
+            <button class="py-2 px-4 font-semibold text-gray-500 hover:text-blue-500">Quản Lý Thu Thập</button>
+          </li>
+          <li id="tab-data" class="tab-item" data-tab="data">
+            <button class="py-2 px-4 font-semibold text-gray-500 hover:text-blue-500">Xem Dữ Liệu</button>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Configuration Tab Content -->
+      <div id="content-config" class="tab-content active">
+        <div class="mt-6">
+          <h2 class="text-xl font-semibold text-gray-800 mb-4">Cấu Hình API</h2>
+          <form id="api-config-form" class="space-y-4">
+            <div>
+              <label for="apiKey" class="block text-sm font-medium text-gray-700">API Key</label>
+              <input type="text" id="apiKey" name="apiKey" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" placeholder="Nhập RapidAPI Key của bạn">
+            </div>
+            <div>
+              <label for="baseUrl" class="block text-sm font-medium text-gray-700">URL Gốc</label>
+              <input type="text" id="baseUrl" name="baseUrl" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" placeholder="URL đã được cấu hình sẵn" disabled>
+            </div>
+            <div>
+              <label for="defaultHeaders" class="block text-sm font-medium text-gray-700">Headers Mặc Định (định dạng JSON)</label>
+              <textarea id="defaultHeaders" name="defaultHeaders" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" placeholder='Headers đã được cấu hình sẵn' disabled></textarea>
+            </div>
+            <div>
+              <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded">
+                Lưu Cấu Hình API
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div id="comment-limits-section" class="mt-8 border-t pt-6">
+          <h2 class="text-xl font-semibold text-gray-800 mb-4">Giới Hạn Bình Luận Theo Đánh Giá</h2>
+          <form id="comment-limits-form" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+              <div>
+                <label for="limit1" class="block text-sm font-medium text-gray-700">Đánh Giá 1 Sao</label>
+                <input type="number" id="limit1" name="1" min="1" max="100" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" value="20">
+              </div>
+              <div>
+                <label for="limit2" class="block text-sm font-medium text-gray-700">Đánh Giá 2 Sao</label>
+                <input type="number" id="limit2" name="2" min="1" max="100" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" value="15">
+              </div>
+              <div>
+                <label for="limit3" class="block text-sm font-medium text-gray-700">Đánh Giá 3 Sao</label>
+                <input type="number" id="limit3" name="3" min="1" max="100" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" value="20">
+              </div>
+              <div>
+                <label for="limit4" class="block text-sm font-medium text-gray-700">Đánh Giá 4 Sao</label>
+                <input type="number" id="limit4" name="4" min="1" max="100" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" value="30">
+              </div>
+              <div>
+                <label for="limit5" class="block text-sm font-medium text-gray-700">Đánh Giá 5 Sao</label>
+                <input type="number" id="limit5" name="5" min="1" max="100" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" value="50">
+              </div>
+            </div>
+            <div>
+              <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded">
+                Lưu Giới Hạn Bình Luận
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div id="cronjob-section" class="mt-8 border-t pt-6">
+          <h2 class="text-xl font-semibold text-gray-800 mb-4">Cài Đặt Lịch Tự Động</h2>
+          <form id="cronjob-form" class="space-y-4">
+            <div class="flex items-center mb-4">
+              <input type="checkbox" id="cronjobEnabled" name="enabled" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+              <label for="cronjobEnabled" class="ml-2 block text-sm text-gray-700">Bật Thu Thập Tự Động</label>
+            </div>
+            <div>
+              <label for="schedule" class="block text-sm font-medium text-gray-700">Lịch Cron</label>
+              <input type="text" id="schedule" name="schedule" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" placeholder="vd: 0 2 * * * (2 giờ sáng hàng ngày)" value="0 2 * * *">
+              <p class="mt-1 text-sm text-gray-500">Định dạng: phút giờ ngày_trong_tháng tháng ngày_trong_tuần</p>
+            </div>
+            <div>
+              <label for="maxUrlsPerRun" class="block text-sm font-medium text-gray-700">Số URL Tối Đa Mỗi Lần Chạy</label>
+              <input type="number" id="maxUrlsPerRun" name="maxUrlsPerRun" min="1" max="100" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" value="10">
+            </div>
+            <div>
+              <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded">
+                Lưu Cài Đặt Lịch
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="mt-8 border-t pt-6">
+          <h2 class="text-xl font-semibold text-gray-800 mb-4">Cấu Hình Google Sheet</h2>
+          <form id="sheet-config-form" class="space-y-4">
+            <div>
+              <label for="googleSheetId" class="block text-sm font-medium text-gray-700">ID Google Sheet</label>
+              <input type="text" id="googleSheetId" name="googleSheetId" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" placeholder="vd: 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms">
+            </div>
+            <div>
+              <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded">
+                Lưu ID Google Sheet
+              </button>
+            </div>
+            <div class="mt-4" id="sheetStatus">
+              <!-- Sheet status will be displayed here -->
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Crawl Management Tab Content -->
+      <div id="content-crawl" class="tab-content hidden">
+        <div class="mt-6">
+          <h2 class="text-xl font-semibold text-gray-800 mb-4">Thêm URL Vào Hàng Đợi Thu Thập</h2>
+          <form id="add-urls-form" class="space-y-4">
+            <div>
+              <label for="urls" class="block text-sm font-medium text-gray-700">URL Sản Phẩm Shopee (mỗi URL một dòng)</label>
+              <textarea id="urls" name="urls" rows="5" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" placeholder="https://shopee.vn/ten-san-pham-i.12345678.1234567890"></textarea>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Chọn Đánh Giá Cần Thu Thập</label>
+              <div class="flex flex-wrap gap-4">
+                <div class="flex items-center">
+                  <input type="checkbox" id="rating1" name="ratings" value="1" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                  <label for="rating1" class="ml-2 text-sm text-gray-700">1 Sao</label>
+                </div>
+                <div class="flex items-center">
+                  <input type="checkbox" id="rating2" name="ratings" value="2" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                  <label for="rating2" class="ml-2 text-sm text-gray-700">2 Sao</label>
+                </div>
+                <div class="flex items-center">
+                  <input type="checkbox" id="rating3" name="ratings" value="3" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                  <label for="rating3" class="ml-2 text-sm text-gray-700">3 Sao</label>
+                </div>
+                <div class="flex items-center">
+                  <input type="checkbox" id="rating4" name="ratings" value="4" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                  <label for="rating4" class="ml-2 text-sm text-gray-700">4 Sao</label>
+                </div>
+                <div class="flex items-center">
+                  <input type="checkbox" id="rating5" name="ratings" value="5" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                  <label for="rating5" class="ml-2 text-sm text-gray-700">5 Sao</label>
+                </div>
+              </div>
+            </div>
+            <div>
+              <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded">
+                Thêm Vào Hàng Đợi
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="mt-8 border-t pt-6">
+          <h2 class="text-xl font-semibold text-gray-800 mb-4">Trạng Thái Thu Thập</h2>
+          <div id="crawl-status" class="mb-4">
+            <!-- Crawl status summary will be displayed here -->
+          </div>
+          <div class="flex flex-wrap gap-2 mb-6">
+            <button id="run-crawl-btn" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded">
+              Thu Thập Ngay
+            </button>
+            <button id="sync-sheets-btn" class="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded">
+              Đồng Bộ Google Sheets
+            </button>
+            <button id="refresh-status-btn" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded">
+              Làm Mới Trạng Thái
+            </button>
+          </div>
+          
+          <!-- Crawl Queue Tabs -->
+          <div class="queue-tabs border-b mb-4">
+            <ul class="flex">
+              <li class="queue-tab-item active mr-4" data-status="pending">
+                <button class="py-2 px-1 font-medium text-blue-600 border-b-2 border-blue-500">Đang Chờ</button>
+              </li>
+              <li class="queue-tab-item mr-4" data-status="processing">
+                <button class="py-2 px-1 font-medium text-gray-500 hover:text-blue-500">Đang Xử Lý</button>
+              </li>
+              <li class="queue-tab-item mr-4" data-status="completed">
+                <button class="py-2 px-1 font-medium text-gray-500 hover:text-blue-500">Đã Hoàn Thành</button>
+              </li>
+              <li class="queue-tab-item" data-status="error">
+                <button class="py-2 px-1 font-medium text-gray-500 hover:text-blue-500">Lỗi</button>
+              </li>
+            </ul>
+          </div>
+          
+          <!-- Queue Content -->
+          <div id="queue-content-pending" class="queue-content active">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">URL</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Sản Phẩm</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Đánh Giá Cần Thu Thập</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thời Gian Thêm</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thao Tác</th>
+                  </tr>
+                </thead>
+                <tbody id="pending-queue-table" class="bg-white divide-y divide-gray-200">
+                  <!-- Pending items will be displayed here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div id="queue-content-processing" class="queue-content hidden">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">URL</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Sản Phẩm</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Đánh Giá Cần Thu Thập</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thời Gian Bắt Đầu</th>
+                  </tr>
+                </thead>
+                <tbody id="processing-queue-table" class="bg-white divide-y divide-gray-200">
+                  <!-- Processing items will be displayed here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div id="queue-content-completed" class="queue-content hidden">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">URL</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Sản Phẩm</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Đánh Giá Đã Thu Thập</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thời Gian Hoàn Thành</th>
+                  </tr>
+                </thead>
+                <tbody id="completed-queue-table" class="bg-white divide-y divide-gray-200">
+                  <!-- Completed items will be displayed here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div id="queue-content-error" class="queue-content hidden">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">URL</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Sản Phẩm</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thông Báo Lỗi</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thời Gian Lỗi</th>
+                  </tr>
+                </thead>
+                <tbody id="error-queue-table" class="bg-white divide-y divide-gray-200">
+                  <!-- Error items will be displayed here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data Viewer Tab Content -->
+      <div id="content-data" class="tab-content hidden">
+        <div class="mt-6">
+          <h2 class="text-xl font-semibold text-gray-800 mb-4">Dữ Liệu Đã Thu Thập</h2>
+          
+          <div class="flex flex-wrap gap-4 mb-6">
+            <div>
+              <label for="data-product-id" class="block text-sm font-medium text-gray-700">ID Sản Phẩm (tùy chọn)</label>
+              <input type="text" id="data-product-id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" placeholder="Lọc theo ID sản phẩm">
+            </div>
+            <div>
+              <label for="data-rating" class="block text-sm font-medium text-gray-700">Đánh Giá (tùy chọn)</label>
+              <select id="data-rating" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                <option value="">Tất Cả Đánh Giá</option>
+                <option value="1">1 Sao</option>
+                <option value="2">2 Sao</option>
+                <option value="3">3 Sao</option>
+                <option value="4">4 Sao</option>
+                <option value="5">5 Sao</option>
+              </select>
+            </div>
+            <div class="self-end">
+              <button id="data-filter-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded">
+                Lọc Dữ Liệu
+              </button>
+            </div>
+            <div class="self-end">
+              <button id="data-export-json-btn" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded">
+                Xuất JSON
+              </button>
+            </div>
+            <div class="self-end">
+              <button id="data-export-csv-btn" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded">
+                Xuất CSV
+              </button>
+            </div>
+          </div>
+          
+          <div id="data-pagination" class="mb-4 flex items-center justify-between">
+            <div class="text-sm text-gray-700">
+              Hiển thị <span id="data-pagination-start">0</span> đến <span id="data-pagination-end">0</span> của <span id="data-pagination-total">0</span> kết quả
+            </div>
+            <div class="flex items-center space-x-2">
+              <button id="data-prev-page" class="px-3 py-1 border rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed">Trước</button>
+              <span id="data-current-page">Trang 1</span>
+              <button id="data-next-page" class="px-3 py-1 border rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed">Sau</button>
+            </div>
+          </div>
+          
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Sản Phẩm</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Đánh Giá</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bình Luận</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tên Người Dùng</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày</th>
+                </tr>
+              </thead>
+              <tbody id="data-table" class="bg-white divide-y divide-gray-200">
+                <!-- Data will be displayed here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50"></div>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html> 
