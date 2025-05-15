@@ -68,13 +68,12 @@ project-root/
 
 1. Clone the repository:
    ```
-   git clone <repository-url>
-   cd shopee-crawl-api
+   git clone https://github.com/yourusername/Craw-shopee-api.git
+   cd Craw-shopee-api
    ```
 
 2. Install backend dependencies:
    ```
-   cd backend
    npm install
    ```
 
@@ -153,4 +152,105 @@ This project is licensed under the MIT License.
 - [Mongoose](https://mongoosejs.com/)
 - [Tailwind CSS](https://tailwindcss.com/)
 - [Google Sheets API](https://developers.google.com/sheets/api)
-- [Shopee E-commerce API](https://rapidapi.com/apidojo/api/shopee-e-commerce-data/) 
+- [Shopee E-commerce API](https://rapidapi.com/apidojo/api/shopee-e-commerce-data/)
+
+## Cài đặt
+
+```bash
+# Clone repository
+git clone https://github.com/yourusername/Craw-shopee-api.git
+cd Craw-shopee-api
+
+# Cài đặt dependencies
+npm install
+```
+
+## Cấu hình
+
+### Môi trường Development
+
+Tạo file `.env` trong thư mục `backend` với nội dung:
+
+```
+PORT=5000
+NODE_ENV=development
+MONGO_URI=mongodb+srv://your_mongodb_uri
+GOOGLE_APPLICATION_CREDENTIALS=./huy-hoang-book-0bf0f972303b.json
+```
+
+### Môi trường Production
+
+Tạo file `.env.production` trong thư mục `backend` với nội dung:
+
+```
+PORT=9005
+NODE_ENV=production
+DOMAIN=vuquangduy.online
+MONGO_URI=mongodb+srv://your_mongodb_uri
+GOOGLE_APPLICATION_CREDENTIALS=./huy-hoang-book-0bf0f972303b.json
+DEFAULT_RAPIDAPI_KEY=your_rapidapi_key
+DEFAULT_RAPIDAPI_HOST=shopee-e-commerce-data.p.rapidapi.com
+```
+
+## Chạy ứng dụng
+
+### Development
+
+```bash
+# Chạy server
+node backend/server.js
+# hoặc với nodemon
+nodemon backend/server.js
+```
+
+### Production với PM2
+
+1. Cài đặt PM2 nếu chưa có:
+
+```bash
+npm install -g pm2
+```
+
+2. Triển khai với PM2:
+
+```bash
+# Khởi động với file cấu hình
+pm2 start ecosystem.config.js --env production
+
+# Đảm bảo PM2 tự khởi động khi server restart
+pm2 startup
+pm2 save
+```
+
+## Cấu hình Nginx (tùy chọn)
+
+Nếu bạn muốn sử dụng domain và HTTPS:
+
+```nginx
+server {
+    listen 80;
+    server_name vuquangduy.online;
+
+    location / {
+        proxy_pass http://localhost:9005;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
+
+## Các lệnh hữu ích
+
+```bash
+# Xem logs
+pm2 logs shopee-crawler
+
+# Restart ứng dụng
+pm2 restart shopee-crawler
+
+# Xem trạng thái
+pm2 status
+``` 

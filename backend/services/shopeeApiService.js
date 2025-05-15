@@ -96,7 +96,18 @@ const processCrawlQueue = async (ratings = [1, 2, 3, 4, 5]) => {
         
         // If Google Sheet is configured, sync the data
         if (config.googleSheetId) {
-          await googleSheetService.syncCrawledDataToSheet(config.googleSheetId, item.productId);
+          try {
+            await googleSheetService.syncCrawledDataToSheet(config.googleSheetId, item.productId);
+          } catch (sheetError) {
+            console.error(`Error syncing to Google Sheet for ${item.url}:`, sheetError);
+            logApiDebug('Google Sheet sync error:', {
+              id: item._id,
+              url: item.url,
+              error: sheetError.message,
+              stack: sheetError.stack
+            });
+            // Không để lỗi Google Sheet ảnh hưởng đến trạng thái crawl
+          }
         }
       } catch (error) {
         console.error(`Error crawling ${item.url}:`, error);

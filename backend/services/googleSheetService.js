@@ -1,12 +1,38 @@
 const { google } = require('googleapis');
 const CrawledData = require('../models/crawledDataModel');
+const path = require('path');
+const fs = require('fs');
 
 // Set up Google Sheets client
 const setupSheetsClient = () => {
   try {
-    // Load service account key from environment variable or file
+    // Xử lý đường dẫn file credentials
+    let keyFilePath;
+    
+    if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+      // Nếu là đường dẫn tương đối (bắt đầu bằng ./)
+      if (process.env.GOOGLE_APPLICATION_CREDENTIALS.startsWith('./')) {
+        keyFilePath = path.join(__dirname, '..', process.env.GOOGLE_APPLICATION_CREDENTIALS.substring(2));
+      } else {
+        // Nếu là đường dẫn tuyệt đối hoặc tên file
+        keyFilePath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+      }
+    } else {
+      // Fallback đến file mặc định
+      keyFilePath = path.join(__dirname, '..', 'huy-hoang-book-0bf0f972303b.json');
+    }
+    
+    console.log(`Using Google credentials file: ${keyFilePath}`);
+    
+    // Kiểm tra file tồn tại
+    if (!fs.existsSync(keyFilePath)) {
+      console.error(`Google credentials file not found at: ${keyFilePath}`);
+      throw new Error(`Google credentials file not found at: ${keyFilePath}`);
+    }
+    
+    // Load service account key
     const auth = new google.auth.GoogleAuth({
-      keyFile: process.env.GOOGLE_APPLICATION_CREDENTIALS || './huy-hoang-book-0bf0f972303b.json',
+      keyFile: keyFilePath,
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     });
     
@@ -175,6 +201,13 @@ const formatComment = (comment) => {
 // Sync crawled data to Google Sheet
 const syncCrawledDataToSheet = async (spreadsheetId, specificProductId = null) => {
   try {
+    if (!spreadsheetId) {
+      console.log('No Google Sheet ID provided, skipping sync');
+      return false;
+    }
+
+    console.log(`Starting sync to Google Sheet: ${spreadsheetId}, productId: ${specificProductId || 'all'}`);
+    
     // Set up Sheets client
     const sheets = setupSheetsClient();
     
@@ -209,57 +242,65 @@ const syncCrawledDataToSheet = async (spreadsheetId, specificProductId = null) =
     
     // Group all comments by product URL
     const distinctUrls = await CrawledData.distinct('originalUrl', query);
+    console.log(`Found ${distinctUrls.length} distinct URLs to sync`);
     
     for (const url of distinctUrls) {
-      // Get all comments for this URL
-      const comments = await CrawledData.find({ originalUrl: url })
-        .sort({ ratingStar: -1, commentTimestamp: -1 });
-      
-      if (comments.length === 0) continue;
-      
-      // Format all comments
-      let allCommentsText = "";
-      for (const comment of comments) {
-        allCommentsText += formatComment(comment);
+      try {
+        // Get all comments for this URL
+        const comments = await CrawledData.find({ originalUrl: url })
+          .sort({ ratingStar: -1, commentTimestamp: -1 });
+        
+        if (comments.length === 0) continue;
+        
+        // Format all comments
+        let allCommentsText = "";
+        for (const comment of comments) {
+          allCommentsText += formatComment(comment);
+        }
+        
+        // Check if URL already exists in sheet
+        const rowIndex = existingUrlMap[url];
+        const updateTime = new Date().toLocaleString();
+        
+        if (rowIndex) {
+          // Update existing row
+          await sheets.spreadsheets.values.update({
+            spreadsheetId,
+            range: `${sheetTitle}!B${rowIndex}:C${rowIndex}`,
+            valueInputOption: 'RAW',
+            resource: {
+              values: [[allCommentsText, updateTime]],
+            },
+          });
+        } else {
+          // Add new row
+          const nextRow = Object.keys(existingUrlMap).length + 2; // +2 for header and 0-indexing
+          await sheets.spreadsheets.values.update({
+            spreadsheetId,
+            range: `${sheetTitle}!A${nextRow}:C${nextRow}`,
+            valueInputOption: 'RAW',
+            resource: {
+              values: [[url, allCommentsText, updateTime]],
+            },
+          });
+          existingUrlMap[url] = nextRow;
+        }
+        
+        // Mark all comments as saved
+        await CrawledData.updateMany(
+          { originalUrl: url },
+          { savedToSheet: true }
+        );
+        
+        console.log(`Synced ${comments.length} comments for URL: ${url}`);
+      } catch (urlError) {
+        console.error(`Error syncing URL ${url}:`, urlError);
+        // Tiếp tục với URL tiếp theo
+        continue;
       }
-      
-      // Check if URL already exists in sheet
-      const rowIndex = existingUrlMap[url];
-      const updateTime = new Date().toLocaleString();
-      
-      if (rowIndex) {
-        // Update existing row
-        await sheets.spreadsheets.values.update({
-          spreadsheetId,
-          range: `${sheetTitle}!B${rowIndex}:C${rowIndex}`,
-          valueInputOption: 'RAW',
-          resource: {
-            values: [[allCommentsText, updateTime]],
-          },
-        });
-      } else {
-        // Add new row
-        const nextRow = Object.keys(existingUrlMap).length + 2; // +2 for header and 0-indexing
-        await sheets.spreadsheets.values.update({
-          spreadsheetId,
-          range: `${sheetTitle}!A${nextRow}:C${nextRow}`,
-          valueInputOption: 'RAW',
-          resource: {
-            values: [[url, allCommentsText, updateTime]],
-          },
-        });
-        existingUrlMap[url] = nextRow;
-      }
-      
-      // Mark all comments as saved
-      await CrawledData.updateMany(
-        { originalUrl: url },
-        { savedToSheet: true }
-      );
-      
-      console.log(`Synced ${comments.length} comments for URL: ${url}`);
     }
     
+    console.log('Google Sheet sync completed successfully');
     return true;
   } catch (error) {
     console.error('Error syncing data to Google Sheet:', error);

@@ -3,7 +3,13 @@ const cors = require('cors');
 const path = require('path');
 const connectDB = require('./config/db');
 const shopeeCron = require('./cronjobs/shopeeCron');
-require('dotenv').config();
+
+// Đọc file .env.production trong môi trường production
+require('dotenv').config({
+  path: process.env.NODE_ENV === 'production'
+    ? path.join(__dirname, '.env.production')
+    : path.join(__dirname, '.env')
+});
 
 // Import routes
 const apiRoutes = require('./routes/api');
@@ -45,4 +51,5 @@ shopeeCron.initCronJob().then(() => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 }); 
