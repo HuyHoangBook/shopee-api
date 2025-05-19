@@ -4,6 +4,12 @@ const shopeeApiService = require('../services/shopeeApiService');
 
 let activeCronJob = null;
 
+// Hàm tạo delay ngẫu nhiên (±30 phút)
+function getRandomStartDelay() {
+  // Ngẫu nhiên từ -30 đến +30 phút (tính bằng mili giây)
+  return Math.floor(Math.random() * 60 * 60 * 1000) - 30 * 60 * 1000;
+}
+
 // Initialize cronjob based on configuration
 const initCronJob = async () => {
   try {
@@ -23,11 +29,28 @@ const initCronJob = async () => {
       // Validate cron schedule
       if (cron.validate(schedule)) {
         activeCronJob = cron.schedule(schedule, () => {
-          console.log(`Running scheduled crawl at ${new Date().toISOString()}`);
-          shopeeApiService.processCrawlQueue();
+          // Nếu cấu hình ngẫu nhiên hóa thời điểm bắt đầu, thêm delay ngẫu nhiên
+          if (config.cronjobSettings.randomizeStartTime) {
+            const delay = getRandomStartDelay();
+            const delayMinutes = Math.round(delay / 60000);
+            const delayDirection = delayMinutes >= 0 ? 'delay' : 'advance';
+            
+            console.log(`Randomizing start time: ${Math.abs(delayMinutes)} minutes ${delayDirection}`);
+            
+            setTimeout(() => {
+              console.log(`Running scheduled crawl at ${new Date().toISOString()} (with randomized timing)`);
+              shopeeApiService.processCrawlQueue();
+            }, Math.max(0, delay)); // Đảm bảo delay không âm
+          } else {
+            console.log(`Running scheduled crawl at ${new Date().toISOString()}`);
+            shopeeApiService.processCrawlQueue();
+          }
         });
         
         console.log(`Cronjob initialized with schedule: ${schedule}`);
+        if (config.cronjobSettings.randomizeStartTime) {
+          console.log('Start time randomization is enabled (±30 minutes)');
+        }
       } else {
         console.error(`Invalid cron schedule: ${schedule}`);
       }
@@ -50,6 +73,7 @@ const setupConfigListener = () => {
       // Check if cronjob status or schedule has changed
       const isEnabled = config.cronjobSettings && config.cronjobSettings.enabled;
       const schedule = config.cronjobSettings?.schedule || '0 2 * * *';
+      const randomizeStartTime = config.cronjobSettings?.randomizeStartTime;
       
       const hasActiveCron = activeCronJob !== null;
       
@@ -64,9 +88,12 @@ const setupConfigListener = () => {
           console.log('Cronjob stopped due to configuration change');
         }
       } else if (isEnabled && hasActiveCron) {
-        // Check if schedule has changed
-        if (activeCronJob._schedule.source !== schedule) {
-          console.log('Cronjob schedule changed, reinitializing');
+        // Check if schedule or randomization setting has changed
+        const currentSchedule = activeCronJob._schedule ? activeCronJob._schedule.source : null;
+        if (currentSchedule !== schedule || 
+            config._previousRandomizeStartTime !== randomizeStartTime) {
+          console.log('Cronjob schedule or randomization setting changed, reinitializing');
+          config._previousRandomizeStartTime = randomizeStartTime;
           initCronJob();
         }
       }

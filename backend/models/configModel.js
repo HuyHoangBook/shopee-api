@@ -19,6 +19,23 @@ const configSchema = new mongoose.Schema(
     googleSheetId: {
       type: String,
       trim: true,
+    },
+    // Thêm các cấu hình kiểm soát tốc độ crawl
+    crawlSettings: {
+      type: Object,
+      default: {
+        minDelay: 5000,       // Delay tối thiểu giữa các request (ms) - increased
+        maxDelay: 15000,      // Delay tối đa giữa các request (ms) - increased
+        maxRetries: 5,        // Số lần thử lại tối đa khi gặp lỗi - increased
+        retryMinDelay: 20000, // Delay tối thiểu khi thử lại (ms) - increased
+        retryMaxDelay: 40000, // Delay tối đa khi thử lại (ms) - increased
+        maxRequestsPerHour: 30 // Giới hạn số request mỗi giờ - decreased
+      }
+    },
+    // Thêm danh sách proxy
+    proxyList: {
+      type: [String],
+      default: []
     }
   },
   {
@@ -35,7 +52,16 @@ configSchema.statics.getConfig = async function() {
       baseUrl: 'https://shopee-e-commerce-data.p.rapidapi.com/shopee/item/ratings',
       defaultHeaders: {
         'x-rapidapi-host': 'shopee-e-commerce-data.p.rapidapi.com',
-      }
+      },
+      crawlSettings: {
+        minDelay: 5000,
+        maxDelay: 15000,
+        maxRetries: 5,
+        retryMinDelay: 20000,
+        retryMaxDelay: 40000,
+        maxRequestsPerHour: 30
+      },
+      proxyList: []
     });
   }
   
@@ -44,6 +70,23 @@ configSchema.statics.getConfig = async function() {
   config.defaultHeaders = {
     'x-rapidapi-host': 'shopee-e-commerce-data.p.rapidapi.com',
   };
+  
+  // Đảm bảo crawlSettings luôn có giá trị mặc định nếu chưa được thiết lập
+  if (!config.crawlSettings) {
+    config.crawlSettings = {
+      minDelay: 5000,
+      maxDelay: 15000,
+      maxRetries: 5,
+      retryMinDelay: 20000,
+      retryMaxDelay: 40000,
+      maxRequestsPerHour: 30
+    };
+  }
+  
+  // Đảm bảo proxyList luôn có giá trị mặc định nếu chưa được thiết lập
+  if (!config.proxyList) {
+    config.proxyList = [];
+  }
   
   return config;
 };

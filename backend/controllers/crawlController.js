@@ -1,6 +1,7 @@
 const CrawlQueue = require('../models/crawlQueueModel');
 const CrawledData = require('../models/crawledDataModel');
 const shopeeApiService = require('../services/shopeeApiService');
+const notificationService = require('../services/notificationService');
 const Config = require('../models/configModel');
 
 // @desc    Get current crawl queue
@@ -262,6 +263,24 @@ const exportCrawledData = async (req, res) => {
   }
 };
 
+// @desc    Get recent error alerts
+// @route   GET /api/crawl/alerts
+// @access  Public
+const getErrorAlerts = async (req, res) => {
+  try {
+    const { limit = 10 } = req.query;
+    const alerts = notificationService.getRecentAlerts(parseInt(limit));
+    
+    res.json({
+      alerts,
+      count: alerts.length
+    });
+  } catch (error) {
+    console.error('Error getting error alerts:', error);
+    res.status(500).json({ message: 'Server Error', error: error.message });
+  }
+};
+
 module.exports = {
   getCrawlQueue,
   addToCrawlQueue,
@@ -270,4 +289,5 @@ module.exports = {
   getCrawlStatus,
   getCrawledData,
   exportCrawledData,
+  getErrorAlerts
 }; 
